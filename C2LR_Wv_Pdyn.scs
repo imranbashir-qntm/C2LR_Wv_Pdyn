@@ -1,0 +1,73 @@
+// Point Netlist Generated on: Jun 10 12:47:48 2026
+// Generated for: spectre
+// Design Netlist Generated on: Jun 10 12:36:43 2026
+// Design library name: test_28hv
+// Design cell name: C2LR_Wv_Pdyn
+// Design view name: schematic
+simulator lang=spectre
+include "ade_e.scs"
+global 0
+include "$SPECTRE_MODEL_PATH/design_wrapper.lib.scs" section=tt_pre
+parameters temperature=26.9 \
+    pwlfile="/home/h638985/projects/Apollo_v1/skill/C2LR_Wv_Pdyn/sine_1MHz_12p5V.pwl" \
+    Vampin=12.5 vH=1 vL=-1 Ramp=20 Vamprf=0 RF_Freq=40M iFreq=1M vmax=12.5 \
+    vmin=-12.5 wireopt=5 DUT_TEMP_K=300 pw=0 Vdc=0 Rsw=1k Cout=1p Cin=100p \
+    tp=(1 / iFreq) DUT_TEMP=(DUT_TEMP_K - 273.1) td=1u tf=(tp / 2) tr=(tp \
+    / 2) tend=20u
+
+// Library name: test_28hv
+// Cell name: C2LR_network_nosw
+// View name: schematic
+subckt C2LR_network_nosw Vo en\<1\> en\<0\> enb\<1\> enb\<0\> gnd inA inB \
+        vdh vss
+    C3 (velec Vo) capacitor c=500.0a
+    C2 (velec gnd) capacitor c=8f
+    C0 (vout gnd) capacitor c=Cout
+    R0 (inA vout) resistor r=Rsw
+    R1 (vout velec) resistor r=5
+ends C2LR_network_nosw
+// End of subcircuit definition.
+
+// Library name: test_28hv
+// Cell name: C2LR_Wv_Pdyn
+// View name: schematic
+C4 (vB gnd) capacitor c=Cin
+C1 (vA gnd) capacitor c=Cin
+V9 (vBen gnd) vsource type=pwl wave=[ 0 vL (td+10*tr+10n) vL \
+        (td+10*tr+30n) vL (td+11*tr) vL ]
+V8 (vAen gnd) vsource type=pwl wave=[ 0 vH (td+10*tr) vH (td+10*tr+10n) vH \
+        (td+11*tr) vH ]
+E3 (en\<1\> gnd vBen gnd) vcvs gain=12.5 type=vcvs
+E2 (enb\<1\> gnd vBen gnd) vcvs gain=-12.5
+E1 (enb\<0\> gnd vAen gnd) vcvs gain=-12.5
+E0 (en\<0\> gnd vAen gnd) vcvs gain=12.5 type=vcvs
+V3 (vdh gnd) vsource dc=vmax type=dc
+V2 (vss gnd) vsource dc=vmin type=dc
+V1 (gnd 0) vsource dc=0 type=dc
+Isw\<0\> (vrf en\<1\> en\<0\> enb\<1\> enb\<0\> gnd net4 vB vdh vss) \
+        C2LR_network_nosw
+V7 (vinA gnd) vsource type=pwl file=pwlfile
+Rprobe (vA net4) resistor r=0 isnoisy=no
+R2 (vinB vB) resistor r=Ramp
+R0 (vinA vA) resistor r=Ramp
+V4 (vrf gnd) vsource dc=0 mag=0 phase=0 type=sine ampl=Vamprf sinephase=0 \
+        freq=RF_Freq
+V6 (vinB gnd) vsource dc=Vdc mag=0 phase=0 type=sine ampl=0 sinephase=0 \
+        freq=iFreq
+simulatorOptions options psfversion="1.4.0" reltol=1e-3 vabstol=1e-6 \
+    iabstol=1e-12 temp=DUT_TEMP tnom=27 scalem=1.0 scale=1.0 gmin=1e-12 \
+    rforce=1 maxnotes=5 maxwarns=5 digits=5 cols=80 pivrel=1e-3 \
+    sensfile="../psf/sens.output" checklimitdest=sqldb 
+tran tran stop=tend errpreset=moderate skipdc=yes write="spectre.ic" \
+    writefinal="spectre.fc" method=gear2only annotate=status maxiters=5 
+finalTimeOP info what=oppoint where=rawfile
+dcOp dc write="spectre.dc" maxiters=150 maxsteps=10000 annotate=status
+dcOpInfo info what=oppoint where=rawfile
+modelParameter info what=models where=rawfile
+element info what=inst where=rawfile
+outputParameter info what=output where=rawfile
+designParamVals info what=parameters where=rawfile
+primitives info what=primitives where=rawfile
+subckts info what=subckts where=rawfile
+save Rprobe:1 
+saveOptions options save=allpub
