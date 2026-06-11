@@ -2,6 +2,10 @@
 ######### C2LR Waveform Analysis ########
 #########################################
 
+# Notes: Follow the user account setup procedure on the EDA server upto step 13. See procedure on the link below.
+# https://co41-confluence.honeywell.lab:4447/display/AP/EDA+Setup
+# After creating the local database, you can use this code to run Spectre simulation remotely.
+
 import numpy as np
 import re
 #import paramiko
